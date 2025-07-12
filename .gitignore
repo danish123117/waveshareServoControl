@@ -1,0 +1,10 @@
+__pycache__/
+.git/
+.vscode/
+.venv/
+*.env
+*.idea/
+examples/
+
+// Include this file in ServoDriver.ino to define your WiFi credentials
+secrets.h
