@@ -2,7 +2,7 @@ import requests
 import time
 
 def _callCommand(parms):
-    base_url = "http://192.168.4.1/cmd" 
+    base_url = "http://192.168.1.100/cmd" 
     try:
         response = requests.post(base_url, params=parms, timeout=5, stream=True)
         print("Request sent.")

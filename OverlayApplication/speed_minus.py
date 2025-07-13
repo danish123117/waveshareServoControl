@@ -1,7 +1,7 @@
 import requests
 import time
 
-base_url = "http://192.168.4.1/cmd" 
+base_url = "http://192.168.1.100/cmd" 
 parms = {"inputT": 1,"inputI": 8,"inputA": 0,"inputB": 0}
 
 try:

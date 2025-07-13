@@ -3,7 +3,7 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include "WEBPAGE.h"
-
+#include <ArduinoJson.h>
 
 // Create AsyncWebServer object on port 80
 WebServer server(80);
@@ -205,7 +205,8 @@ void webCtrlServer(){
   Serial.println("Server Starts.");
 }
 */
-
+/*
+// old webCtrlServer function with POST method
 void webCtrlServer() {
   server.on("/", handleRoot);
   server.on("/readID", handleID);
@@ -230,6 +231,113 @@ void webCtrlServer() {
   server.begin();
   Serial.println("Server Starts.");
 }
+
+
+*/
+
+void webCtrlServer() {
+  server.on("/", handleRoot);
+  server.on("/readID", handleID);
+  server.on("/readSTS", handleSTS);
+
+  // Handle basic command
+  server.on("/cmd", HTTP_ANY, []() {
+    int cmdT = server.arg(0).toInt();
+    int cmdI = server.arg(1).toInt();
+    int cmdA = server.arg(2).toInt();
+    int cmdB = server.arg(3).toInt();
+
+    switch (cmdT) {
+      case 0: activeID(cmdI); break;
+      case 1: activeCtrl(cmdI); break;
+      case 9: searchCmd = true; break;
+    }
+
+    server.send(200, "text/plain", "OK");
+  });
+
+  // New endpoint to control multiple motors with position, speed, and acc lists
+  server.on("/setPosition", HTTP_POST, []() {
+    if (server.args() == 0) {
+      server.send(400, "text/plain", "No body received");
+      return;
+    }
+
+    // Allocate a reasonable buffer (adjust upward for >10 motors)
+    const size_t capacity = JSON_ARRAY_SIZE(10) * 4 + JSON_OBJECT_SIZE(4) + 300;
+    DynamicJsonDocument doc(capacity);
+
+    DeserializationError error = deserializeJson(doc, server.arg(0));
+    if (error) {
+      server.send(400, "text/plain", "Invalid JSON");
+      return;
+    }
+
+    JsonArray idsArray     = doc["ids"];
+    JsonArray posArray     = doc["positions"];
+    JsonArray speedArray   = doc["speed"];
+    JsonArray accArray     = doc["acc"];
+
+    size_t n = idsArray.size();
+    if (n == 0 ||
+        posArray.size() != n ||
+        speedArray.size() != n ||
+        accArray.size() != n) {
+      server.send(400, "text/plain", "Array size mismatch or empty lists");
+      return;
+    }
+
+    u8* ids        = new u8[n];
+    s16* positions = new s16[n];
+    u16* speeds    = new u16[n];
+    u8* accs       = new u8[n];
+
+    for (size_t i = 0; i < n; ++i) {
+      ids[i]        = (u8)idsArray[i].as<int>();
+      positions[i]  = (s16)posArray[i].as<int>();
+      speeds[i]     = (u16)speedArray[i].as<int>();
+      accs[i]       = (u8)accArray[i].as<int>();
+    }
+
+    st.SyncWritePosEx(ids, n, positions, speeds, accs);
+
+    delete[] ids;
+    delete[] positions;
+    delete[] speeds;
+    delete[] accs;
+
+    server.send(200, "text/plain", "Motor positions updated");
+  }
+);
+server.on("/getServoStatus", HTTP_GET, []() {
+  String response = "{";
+  for (int i = 0; i < searchNum; i++) {
+    byte id = listID[i];
+    getFeedBack(id);  // <- This is key
+
+    response += "\"id" + String(id) + "\": {";
+    response += "\"position\": " + String(posRead[id]) + ",";
+    response += "\"speed\": " + String(speedRead[id]) + ",";
+    response += "\"load\": " + String(loadRead[id]) + ",";
+    response += "\"voltage\": " + String(float(voltageRead[id]) / 10) + ",";
+    response += "\"temperature\": " + String(temperRead[id]) + ",";
+    response += "\"mode\": " + String(modeRead[id]);
+    response += "}";
+
+    if (i < searchNum - 1) {
+      response += ",";
+    }
+  }
+  response += "}";
+
+  server.send(200, "application/json", response);
+});
+
+
+  server.begin();
+  Serial.println("Server Starts.");
+}
+
 
 void webServerSetup(){
   webCtrlServer();
@@ -266,6 +374,17 @@ void setSTA(){
 */
 void setSTA(){
   WiFi.mode(WIFI_STA);
+
+  IPAddress local_IP(192, 168, 1, 100);      // Desired static IP
+  IPAddress gateway(192, 168, 1, 1);         // Your router’s IP
+  IPAddress subnet(255, 255, 255, 0);        // Subnet mask
+
+  if (!WiFi.config(local_IP, gateway, subnet)) {
+    Serial.println("STA Failed to configure");
+  }
+
+
+
   WiFi.begin(STA_SSID, STA_PWD);
   Serial.print("Connecting to WiFi");
 

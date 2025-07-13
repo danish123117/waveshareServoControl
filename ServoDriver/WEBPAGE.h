@@ -216,6 +216,11 @@ const char index_html[] PROGMEM = R"rawliteral(
                 }
             }
         }
+        function setPosition(inputT, inputI, inputA, inputB) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "cmd?inputT="+inputT+"&inputI="+inputI+"&inputA="+inputA+"&inputB="+inputB, true);
+            xhr.send();
+        }
 
     </script>
 </body>

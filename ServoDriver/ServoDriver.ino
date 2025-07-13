@@ -2,8 +2,7 @@
 #include "secrets.h"
 
 // WIFI_AP settings.
-const char* AP_SSID = "ESP32_DEV";
-const char* AP_PWD  = "12345678";
+
 
 
 
