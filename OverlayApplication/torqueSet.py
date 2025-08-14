@@ -4,11 +4,14 @@ import time
 
 # Replace with the IP of your ESP32 board
 ESP32_IP = "http://192.168.1.100"  # or your local IP from serial monitor
+
+## torqueLimit range is 0-1000(0-100% of the servo's torque)
 data ={
   "ids": [1],
   "torqueLimit": [50],
   "enable": [1]
 }
+
 try:
     response = requests.post(url= f"{ESP32_IP}/setTorque", json=data)
     print("Status code:", response.status_code)
