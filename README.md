@@ -13,3 +13,4 @@ const char* STA_PWD  = "your pawifi password";
 ### Updates with respect to cloned repo
  1) switch to st as default servo
  2) switch from access point mode to external wifi connection
+ 3) added the possibility to change the locking torque of the servo with /setTorque rest api endpoint / modify SMS_STS.h and .cpp files
