@@ -269,3 +269,11 @@ int SMS_STS::ReadCurrent(int ID)
 	return Current;
 }
 
+int SMS_STS::SetTorqueLimit(u8 ID, u16 Limit) {
+    if (Limit > 1000) Limit = 1000;  // clamp
+    u8 low = Limit & 0xFF;
+    u8 high = (Limit >> 8) & 0xFF;
+    int res = writeByte(ID, SMS_STS_TORQUE_LIMIT_L, low);
+    res += writeByte(ID, SMS_STS_TORQUE_LIMIT_H, high);
+    return res;
+}

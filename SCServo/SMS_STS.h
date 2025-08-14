@@ -78,6 +78,7 @@ public:
 	virtual int ReadMove(int ID);//读移动状态 Read moving status
 	virtual int ReadCurrent(int ID);//读电流 Read current
 	virtual int ReadMode(int ID); //读模式 Read mode
+	virtual int SetTorqueLimit(u8 ID, u16 Limit); //设置扭矩限制 Set torque limit
 private:
 	u8 Mem[SMS_STS_PRESENT_CURRENT_H-SMS_STS_PRESENT_POSITION_L+1];
 };

@@ -146,3 +146,8 @@ void servoStop(byte servoID){
 void servoTorque(byte servoID, u8 enableCMD){
   st.EnableTorque(servoID, enableCMD);
 }
+
+void servoChangeTorque(byte servoID, uint16_t torqueLimit, u8 enableCMD) {
+    st.SetTorqueLimit(servoID, torqueLimit); // set torque limit (0–1000)
+    st.EnableTorque(servoID, enableCMD);     // enable or disable torque
+}

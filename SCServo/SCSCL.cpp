@@ -279,3 +279,4 @@ int SCSCL::ReadCurrent(int ID)
 	}	
 	return Current;
 }
+

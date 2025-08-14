@@ -332,7 +332,55 @@ server.on("/getServoStatus", HTTP_GET, []() {
 
   server.send(200, "application/json", response);
 });
+//THis was added on 14-8
+server.on("/setTorque", HTTP_POST, []() {
+    if (server.args() == 0) {
+      server.send(400, "text/plain", "No body received");
+      return;
+    }
 
+    // Adjust size as needed
+    const size_t capacity = JSON_ARRAY_SIZE(10) * 3 + JSON_OBJECT_SIZE(3) + 200;
+    DynamicJsonDocument doc(capacity);
+
+    DeserializationError error = deserializeJson(doc, server.arg(0));
+    if (error) {
+      server.send(400, "text/plain", "Invalid JSON");
+      return;
+    }
+
+    JsonArray idsArray         = doc["ids"];
+    JsonArray torqueArray      = doc["torqueLimit"];
+    JsonArray enableArray      = doc["enable"];
+
+    size_t n = idsArray.size();
+    if (n == 0 ||
+        torqueArray.size() != n ||
+        enableArray.size() != n) {
+      server.send(400, "text/plain", "Array size mismatch or empty lists");
+      return;
+    }
+
+    u8* ids        = new u8[n];
+    u16* torques   = new u16[n];
+    u8* enables    = new u8[n];
+
+    for (size_t i = 0; i < n; ++i) {
+      ids[i]     = (u8)idsArray[i].as<int>();
+      torques[i] = (u16)torqueArray[i].as<int>();
+      enables[i] = (u8)enableArray[i].as<int>();
+
+      // Apply torque limit and enable for each motor
+      st.SetTorqueLimit(ids[i], torques[i]);
+      st.EnableTorque(ids[i], enables[i]);
+    }
+
+    delete[] ids;
+    delete[] torques;
+    delete[] enables;
+
+    server.send(200, "text/plain", "Torque settings updated");
+});
 
   server.begin();
   Serial.println("Server Starts.");
@@ -378,6 +426,11 @@ void setSTA(){
   IPAddress local_IP(192, 168, 1, 100);      // Desired static IP
   IPAddress gateway(192, 168, 1, 1);         // Your router’s IP
   IPAddress subnet(255, 255, 255, 0);        // Subnet mask
+
+
+  //IPAddress local_IP(172, 17, 40, 100);      // Desired static IP
+  //IPAddress gateway(172, 17, 40, 1);         // Your router’s IP
+  //IPAddress subnet(255, 255, 255, 0); 
 
   if (!WiFi.config(local_IP, gateway, subnet)) {
     Serial.println("STA Failed to configure");
