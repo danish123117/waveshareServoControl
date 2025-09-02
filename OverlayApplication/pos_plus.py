@@ -1,7 +1,7 @@
 import requests
 import time
 
-base_url = "http://192.168.4.1/cmd" 
+base_url = "http://192.168.1.100/cmd" 
 down = {"inputT": 1,"inputI": 5,"inputA": 0,"inputB": 0}
 up = {"inputT": 1, "inputI": 2, "inputA": 0, "inputB": 0}
 
@@ -15,7 +15,7 @@ try:
 except requests.exceptions.RequestException as e:
     print("Request failed:", e)
 
-time.sleep(2)   
+time.sleep(5)   
 
 try:
     response = requests.get(base_url, params=up, timeout=1, stream=True)

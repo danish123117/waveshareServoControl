@@ -1,7 +1,7 @@
 import requests
 import time
 
-base_url = "http://192.168.4.1/cmd"  # Replace with actual IP
+base_url = "http://192.168.1.100/cmd"  # Replace with actual IP
 
 # The parameters you want to replicate
 down = {
