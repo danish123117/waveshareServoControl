@@ -3,13 +3,13 @@ import json
 import time
 
 # Replace with the IP of your ESP32 board
-ESP32_IP = "http://192.168.1.100"  # or your local IP from serial monitor
+ESP32_IP = "http://172.17.40.100/"  # or your local IP from serial monitor
 
 ## torqueLimit range is 0-1000(0-100% of the servo's torque)
 data ={
-  "ids": [1],
-  "torqueLimit": [50],
-  "enable": [1]
+  "ids": [1,2],
+  "torqueLimit": [1000,1000],
+  "enable": [1,1]
 }
 
 try:

@@ -99,30 +99,40 @@ void setup() {
   servoInit();
 
   wifiInit();
-
+  torsionInit();
+  controlTorque2Init(); //this added for torsional spring control
   webServerSetup();
 
   RGBoff();
 
   delay(1000);
   pingAll(true);
+  releaseLock();
 
   threadInit();
+
 }
 
 
+
 void loop() {
+  
+ /* 
+  server.handleClient();
+  int a =1 ;
+  if (a==1) {
+    unsigned long now = millis();
+    if (now - lastLoopTime >= 50) {  // 20Hz -> 50ms
+      lastLoopTime = now;
+      // 👇 Call your torque control loop here
+      controlTorque2(-0.05, 0.165, 0.06, 0.08);
+    }
+  }
+*/
+
   delay(300000);
+  // screenUpdate();
 
-  // st.WritePosEx(1, 25, 600, 0);
-  // st.WritePosEx(2, 25, 600, 0);
-  // st.WritePosEx(3, 25, 600, 0);
-  // delay(2000);
-
-  // st.WritePosEx(1, 1000, 600, 0);
-  // st.WritePosEx(2, 1000, 600, 0);
-  // st.WritePosEx(3, 1000, 600, 0);
-  // delay(2000);
 }
 
 
